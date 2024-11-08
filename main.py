@@ -5,6 +5,7 @@ import seaborn as sns
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import GridSearchCV
+from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 
 df = pd.read_excel("crop-yield-data.xlsx")
 #print(df.head())
@@ -79,5 +80,24 @@ rfr = RandomForestRegressor()
 best_rfr = RandomForestRegressor(max_depth=4, min_samples_leaf=2, min_samples_split=6,n_estimators=100, random_state=42)
 best_rfr.fit(X_train, y_train)
 print(best_rfr.score(X_train, y_train))
+r_pred = best_rfr.predict(X_test)
 
 
+plt.figure()
+sns.distplot(y_test).set_title('Random Forest Regressor')
+sns.distplot(r_pred)
+
+
+# Showing Evaluation metrics
+print("Random Forest Regressor")
+print("Mean Squared Error: ", mean_squared_error(y_test, r_pred))
+print("Mean Absolute Error: ", mean_absolute_error(y_test, r_pred))
+print("R2 Score: ", r2_score(y_test, r_pred))
+
+
+# Showing feature importance
+plt.figure()
+feature_df = pd.DataFrame({'Features':X_train.columns, 'Importance':best_rfr.feature_importances_})
+feature_df.sort_values(by='Importance', ascending=False, inplace=True)
+sns.barplot(x = 'Importance', y = 'Features', data = feature_df).set_title('Random Forest Regressor')
+plt.show()
