@@ -2,6 +2,9 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.model_selection import GridSearchCV
 
 df = pd.read_excel("crop-yield-data.xlsx")
 #print(df.head())
@@ -50,6 +53,31 @@ for col in columns:
 # sns.regplot(x = 'Phosphorus (P)', y = 'Yield (Q/acre)', data = df, ax = ax[1])
 # sns.regplot(x = 'Potassium (K)', y = 'Yield (Q/acre)', data = df, ax = ax[2])
 
-plt.figure()
-sns.heatmap(df.corr(), annot = True)
-plt.show()
+# plt.figure()
+# sns.heatmap(df.corr(), annot = True)
+# plt.show()
+
+# --------------------------------------------------------------------------------
+
+# Creating train/test split
+X_train, X_test, y_train, y_test = train_test_split(df.drop('Yield (Q/acre)', axis = 1), df['Yield (Q/acre)'], test_size = 0.2)
+
+rfr = RandomForestRegressor()
+# Parameters for grid search
+# parameters = {
+#     "n_estimators": [100,200,300],
+#     "min_samples_split": [2,4,6,8],
+#     "min_samples_leaf": [2,4,6,8],
+#     "random_state": [0,42],
+#     "max_depth": [2,4,6,8],
+# }
+
+# grid = GridSearchCV(rfr, parameters, cv = 5, n_jobs = -1, verbose = 1)
+# grid.fit(X_train, y_train)
+# print(grid.best_params_) # {'max_depth': 8, 'min_samples_leaf': 2, 'min_samples_split': 2, 'n_estimators': 300, 'random_state': 42}
+
+best_rfr = RandomForestRegressor(max_depth=4, min_samples_leaf=2, min_samples_split=6,n_estimators=100, random_state=42)
+best_rfr.fit(X_train, y_train)
+print(best_rfr.score(X_train, y_train))
+
+
